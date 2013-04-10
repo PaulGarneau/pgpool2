@@ -1,3 +1,4 @@
+//bjm
 /* -*-pgsql-c-*- */
 /*
  * $Header$
@@ -125,7 +126,7 @@ void do_child(int unix_fd, int inet_fd)
 	signal(SIGPIPE, SIG_IGN);
 
 #ifdef NONE_BLOCK
-	/* set listen fds to none block */
+	/* set listen fds to non-blocking */
 	pool_set_nonblock(unix_fd);
 	if (inet_fd)
 	{
@@ -160,7 +161,7 @@ void do_child(int unix_fd, int inet_fd)
 	 * Open pool_passwd in child process.  This is necessary to avoid the
 	 * file descriptor race condition reported in [pgpool-general: 1141].
 	 */
-	if (strcmp("", pool_config->pool_passwd))
+	if (strlen(pool_config->pool_passwd) == 0)
 	{
 		pool_reopen_passwd_file();
 	}
@@ -245,6 +246,7 @@ void do_child(int unix_fd, int inet_fd)
 		}
 
 		/* SSL? */
+// what do these numbers mean?
 		if (sp->major == 1234 && sp->minor == 5679 && !frontend->ssl_active)
 		{
 			pool_debug("SSLRequest from client");

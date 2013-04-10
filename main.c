@@ -1,3 +1,4 @@
+//bjm
 /* -*-pgsql-c-*- */
 /*
  * $Header$
@@ -188,6 +189,8 @@ int my_master_node_id;		/* Master node id buffer */
 int myargc;
 char **myargv;
 
+// main() function is too large, 600 lines, break into functions?
+//    cache reset, main loop, etc.
 /*
 * pgpool main program
 */
@@ -403,6 +406,7 @@ int main(int argc, char **argv)
 		{
 			if (kill(pid, 0) == 0)
 			{
+// is there any facility for error message translation?
 				fprintf(stderr, "pid file found. is another pgpool(%d) is running?\n", pid);
 				exit(1);
 			}
@@ -454,7 +458,7 @@ int main(int argc, char **argv)
 	 * The default file name "pool_passwd" can be changed by setting
 	 * pgpool.conf's "pool_passwd" directive.
 	 */
-	if (strcmp("", pool_config->pool_passwd))
+	if (strlen(pool_config->pool_passwd) == 0)
 	{
 		char pool_passwd[POOLMAXPATHLEN+1];
 		char dirnamebuf[POOLMAXPATHLEN+1];
@@ -893,6 +897,7 @@ static void usage(void)
 	fprintf(stderr, "  -c, --clear         Clears query cache (enable_query_cache must be on)\n");
 	fprintf(stderr, "  -C, --clear-oidmaps Clears query cache oidmaps when memqcache_method is memcached\n");
 	fprintf(stderr, "                      (If shmem, discards whenever pgpool starts.)\n");
+// rename to no-detach?  matches -n
 	fprintf(stderr, "  -n, --dont-detach   Don't run in daemon mode, does not detach control tty\n");
 	fprintf(stderr, "  -D, --discard-status Discard pgpool_status file and do not restore previous status\n");
 	fprintf(stderr, "  -d, --debug         Debug mode\n\n");
@@ -942,6 +947,7 @@ static void daemonize(void)
 	write_pid_file();
 	rc_chdir = chdir("/");
 
+	/* close stdin, stdout, stderr */
 	i = open("/dev/null", O_RDWR);
 	dup2(i, 0);
 	dup2(i, 1);
@@ -952,6 +958,7 @@ static void daemonize(void)
 		closelog();
 	}
 
+	/* close other file descriptors */
     fdlimit = sysconf(_SC_OPEN_MAX);
     for (i = 3; i < fdlimit; i++)
 		close(i);
@@ -988,6 +995,8 @@ static void stop_me(void)
 
 	fprintf(stderr, "stop request sent to pgpool. waiting for termination...");
 
+
+	/* wait for kill to fail,  pid dead */
 	while (kill(pid, 0) == 0)
 	{
 		fprintf(stderr, ".");
@@ -996,6 +1005,7 @@ static void stop_me(void)
 	fprintf(stderr, "done.\n");
 }
 
+// move pid/status control to another C file?
 /*
 * read the pid file
 */
@@ -1129,6 +1139,7 @@ static int read_status_file(bool discard_status)
 		}
 	}
 
+// why is it a bogus file?
 	/*
 	 * If no one woke up, we regard the status file bogus
 	 */
@@ -1178,6 +1189,7 @@ static int write_status_file(void)
 	return 0;
 }
 
+// what is PCP?  Postgres Connection Pool?
 /*
  * fork a child for PCP
  */
@@ -1189,6 +1201,7 @@ pid_t pcp_fork_a_child(int unix_fd, int inet_fd, char *pcp_conf_file)
 
 	if (pid == 0)
 	{
+// what are pipe_fds?
 		close(pipe_fds[0]);
 		close(pipe_fds[1]);
 
@@ -1351,6 +1364,7 @@ static int create_inet_domain_socket(const char *hostname, const int port)
 	}
 
 	backlog = pool_config->num_init_children * 2;
+// add underscores to macro name
 	if (backlog > PGPOOLMAXLITSENQUEUELENGTH)
 		backlog = PGPOOLMAXLITSENQUEUELENGTH;
 
@@ -1429,7 +1443,9 @@ static void myexit(int code)
 				kill(pid, SIGTERM);
 			}
 		}
-		while (wait(NULL) > 0)
+		/* wait for all children to exit */
+		// need more error checking here?
+		while (wait(NULL) != -1)
 			;
 		if (errno != ECHILD)
 			pool_error("wait() failed. reason:%s", strerror(errno));
@@ -1460,6 +1476,7 @@ void notice_backend_error(int node_id)
 	}
 }
 
+// what is degenerate?
 /* notice backend connection error using SIGUSR1 */
 void degenerate_backend_set(int *node_id_set, int count)
 {
@@ -1533,7 +1550,7 @@ void promote_backend(int node_id)
 	Req_info->node_id[0] = node_id;
 	pool_log("promote_backend: %d promote node request from pid %d", node_id, getpid());
 
-	if (!pool_config->use_watchdog || WD_OK == wd_promote_backend(node_id))
+	if (!pool_config->use_watchdog || wd_promote_backend(node_id) == WD_OK)
 	{
 		kill(parent, SIGUSR1);
 	}
@@ -1668,10 +1685,12 @@ static RETSIGTYPE failover_handler(int sig)
 {
 	POOL_SETMASK(&BlockSig);
 	failover_request = 1;
+	// why null byte?
 	write(pipe_fds[1], "\0", 1);
 	POOL_SETMASK(&UnBlockSig);
 }
 
+// this function seems very complex
 /*
  * backend connection error, failover/failback request, if possible
  * failover() must be called under protecting signals.
@@ -1915,6 +1934,7 @@ static void failover(void)
 
 /* no need to wait since it will be done in reap_handler */
 #ifdef NOT_USED
+// != -1 ?
 	while (wait(NULL) > 0)
 		;
 

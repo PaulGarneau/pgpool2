@@ -831,7 +831,7 @@ free_query_cache_info(void)
  * malloc_failed() - checks if the caller's most recent malloc() has succeeded
  *
  * returns 0 if malloc() was a success, -1 otherwise
-`* --------------------------------
+ * --------------------------------
  */
 static int
 malloc_failed(void *p)
