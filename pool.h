@@ -554,6 +554,12 @@ extern POOL_CONNECTION_POOL_SLOT *make_persistent_db_connection(
 	char *hostname, int port, char *dbname, char *user, char *password, bool retry);
 extern void discard_persistent_db_connection(POOL_CONNECTION_POOL_SLOT *cp);
 
+/* pid.c */
+int read_pid_file(void);
+void write_pid_file(void);
+int read_status_file(bool discard_status);
+int write_status_file(void);
+
 /* define pool_system.c */
 extern POOL_CONNECTION_POOL_SLOT *pool_system_db_connection(void);
 extern DistDefInfo *pool_get_dist_def_info (char * dbname, char * schema_name, char * table_name);

@@ -67,8 +67,8 @@ am_pg_md5_OBJECTS = pg_md5.$(OBJEXT) md5.$(OBJEXT) \
 	pool_globals.$(OBJEXT) strlcpy.$(OBJEXT)
 pg_md5_OBJECTS = $(am_pg_md5_OBJECTS)
 pg_md5_LDADD = $(LDADD)
-am_pgpool_OBJECTS = main.$(OBJEXT) child.$(OBJEXT) pool_auth.$(OBJEXT) \
-	pool_config.$(OBJEXT) pool_error.$(OBJEXT) \
+am_pgpool_OBJECTS = main.$(OBJEXT) child.$(OBJEXT) pid.$(OBJEXT) \
+	pool_auth.$(OBJEXT) pool_config.$(OBJEXT) pool_error.$(OBJEXT) \
 	pool_process_query.$(OBJEXT) pool_stream.$(OBJEXT) \
 	pool_connection_pool.$(OBJEXT) pool_params.$(OBJEXT) \
 	pool_signal.$(OBJEXT) pcp_child.$(OBJEXT) md5.$(OBJEXT) \
@@ -315,7 +315,7 @@ pgpool_SOURCES = pool.h pool_type.h version.h pgpool.conf.sample \
 	pgpool.conf.sample-replication pgpool.conf.sample-master-slave \
 	pgpool.conf.sample-stream \
 	README.euc_jp README.online-recovery pgpool.spec \
-	main.c child.c pool_auth.c pool_config.l pool_config.h pool_error.c \
+	main.c child.c pid.c pool_auth.c pool_config.l pool_config.h pool_error.c \
 	pool_process_query.c pool_stream.c pool_stream.h pool_connection_pool.c pool_params.c \
 	pool_signal.h pool_signal.c pcp_child.c md5.c md5.h pcp.conf.sample \
 	pool_ipc.h pool_shmem.c pool_sema.c pool_system.c \
