@@ -1,4 +1,3 @@
-//bjm
 /* -*-pgsql-c-*- */
 /*
  * $Header$

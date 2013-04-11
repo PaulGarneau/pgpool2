@@ -1,5 +1,3 @@
-//bjm
-
 // update with community version?
 
 /* -*-pgsql-c-*- */
